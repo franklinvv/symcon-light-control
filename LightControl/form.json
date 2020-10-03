@@ -1,0 +1,50 @@
+{
+    "elements": [
+        {
+            "name":"BottomDimValue",
+            "type":"NumberSpinner",
+            "caption":"Bottom dim value"
+        },
+        {
+            "name":"TopDimValue",
+            "type":"NumberSpinner",
+            "caption":"Top dim value"
+        },
+        {
+            "name":"BottomSwitchValue",
+            "type":"NumberSpinner",
+            "caption":"Bottom switch value"
+        },
+        {
+            "name":"TopSwitchValue",
+            "type":"NumberSpinner",
+            "caption":"Top switch value"
+        },
+        {
+            "type": "List",
+            "name": "Variables",
+            "caption": "Variables",
+            "add": true,
+            "delete": true,
+            "sort": {
+                "column": "VariableID",
+                "direction": "ascending"
+            },
+            "columns": [
+                {
+                    "caption": "Variable",
+                    "name": "VariableID",
+                    "width": "auto",
+                    "add": 0,
+                    "edit": {
+                        "type": "SelectVariable"
+                    },
+                    "save": false
+                }
+            ],
+            "values": []
+        }
+    ],
+    "actions": [],
+    "status": []
+}

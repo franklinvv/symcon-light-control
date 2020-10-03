@@ -1,0 +1,12 @@
+{
+    "id": "{A22ABB6D-D408-DA39-69C1-BFB835D42558}",
+    "name": "LightControl",
+    "type": 3,
+    "vendor": "",
+    "aliases": [],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "LC",
+    "url": ""
+}
