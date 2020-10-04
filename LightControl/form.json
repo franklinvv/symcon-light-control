@@ -20,6 +20,10 @@
             "type":"NumberSpinner",
             "caption":"Top switch value"
         },
+        {   "type": "SelectVariable", 
+            "name": "IlluminationValue",
+            "caption": "Illumination sensor value"
+        },
         {
             "type": "List",
             "name": "Variables",
