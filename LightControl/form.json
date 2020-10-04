@@ -20,28 +20,28 @@
             "type":"NumberSpinner",
             "caption":"Top switch value"
         },
-        {   "type": "SelectVariable", 
+        {   "type": "SelectVariable",
             "name": "IlluminationValue",
             "caption": "Illumination sensor value"
         },
         {
             "type": "List",
-            "name": "Variables",
-            "caption": "Variables",
+            "name": "Instances",
+            "caption": "Instances",
             "add": true,
             "delete": true,
             "sort": {
-                "column": "VariableID",
+                "column": "InstanceID",
                 "direction": "ascending"
             },
             "columns": [
                 {
-                    "caption": "Variable",
-                    "name": "VariableID",
+                    "caption": "Instance",
+                    "name": "InstanceID",
                     "width": "auto",
                     "add": 0,
                     "edit": {
-                        "type": "SelectVariable"
+                        "type": "SelectInstance"
                     },
                     "save": false
                 }
