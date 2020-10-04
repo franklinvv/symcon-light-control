@@ -1,8 +1,19 @@
 {
     "translations": {
-        "de": {
-            "Translation 1": "Übersetzung 1",
-            "Translation 2": "Übersetzung 2"
+        "nl": {
+            "Bottom dim value": "Onderwaarde voor dimmen",
+            "Top dim value": "Bovenwaarde voor dimmen",
+            "Bottom switch value": "Onderwaarde voor schakelen",
+            "Top switch value": "Bovenwaarde voor schakelen",
+            "Illumination sensor value": "Lichtsensor",
+            "Number of seconds for transition": "Aantal seconde voor transitie",
+            "Enabling variables": "Inschakelende variabelen",
+            "Variable": "Variabele",
+            "Instance": "Instantie",
+            "Instances": "Instanties",
+            "Invert": "Omschakelen",
+            "Yes": "Ja",
+            "No": "Nee"
         }
     }
 }
