@@ -5,21 +5,19 @@
 			//Never delete this line!
 			parent::Create();
 
+			$this->createVariableProfiles();
+
 			$this->RegisterPropertyInteger("BottomDimValue", 0);
 			$this->RegisterPropertyInteger("TopDimValue", 0);
 			$this->RegisterPropertyInteger("BottomSwitchValue", 0);
 			$this->RegisterPropertyInteger("TopSwitchValue", 0);
 			$this->RegisterPropertyInteger("IlluminationValue", 0);
 			$this->RegisterPropertyString("Instances", "");
-
-			$this->RegisterVariableFloat("CurrentFloatValue", "Current float value", "", 0);
-//			$var = IPS_GetObjectIDByIdent("CurrentFloatValue", $this->InstanceID);
-
-			$this->RegisterVariableBoolean("CurrentSwitchValue", "Current switch value", "~Switch", true);
-//			$var = IPS_GetObjectIDByIdent("CurrentSwitchValue", $this->InstanceID);
-
-			$this->RegisterVariableInteger("CurrentIntegerValue", "Current integer value", "", 0);
-//			$var = IPS_GetObjectIDByIdent("CurrentIntegerValue", $this->InstanceID);
+			$this->RegisterPropertyString("EnablingVariables", "");
+			$this->RegisterPropertyInteger("DelayValue", 5);
+			
+			$this->RegisterVariableInteger("CurrentDimValue", "Current dim value", "LC.Brightness", 0);
+			$this->RegisterVariableBoolean("CurrentSwitchValue", "Current switch value", "~Switch", false);
 		}
 
 		public function ApplyChanges() {
@@ -32,7 +30,29 @@
 			}
 		}
 
+		private function createVariableProfiles() {
+			$profileName = "LC.Brightness";
+			IPS_DeleteVariableProfile($profileName);
+
+			IPS_CreateVariableProfile($profileName, 1);
+			IPS_SetVariableProfileText($profileName, "", "%");
+			IPS_SetVariableProfileIcon($profileName,  "Intensity");
+		}
+
 		public function MessageSink($timestamp, $senderId, $message, $data) {
+			$enablingVariables = $this->getEnablingVariables();
+			foreach($enablingVariables as $enablingVariable) {
+				if(GetValueBoolean($enablingVariable->VariableID) && $enablingVariable->Invert) {
+					return;
+				}
+
+				if(!GetValueBoolean($enablingVariable->VariableID) && !$enablingVariable->Invert) {
+					return;
+				}
+			}
+
+			$transitionTime = $this->ReadPropertyInteger("DelayValue") * 10;
+
 			$illuminationValueSource = $this->ReadPropertyInteger("IlluminationValue");
 			if($senderId != $illuminationValueSource) {
 				$this->UnregisterMessage($senderId, VM_UPDATE);
@@ -40,14 +60,11 @@
 
 			$illumination = GetValueInteger($illuminationValueSource);
 
-			$floatValue = $this->calculateFloatValue($illumination);
-			$this->SetValue("CurrentFloatValue", $floatValue);
+			$dimValue = $this->calculateDimValue($illumination);
+			$this->SetValue("CurrentDimValue", $dimValue);
 
-			$boolValue = $this->calculateSwitchValue($illumination);
-			$this->SetValue("CurrentSwitchValue", $boolValue);
-
-			$integerValue = $this->calculateIntegerValue($illumination);
-			$this->SetValue("CurrentIntegerValue", $integerValue);
+			$switchValue = $this->calculateSwitchValue($illumination);
+			$this->SetValue("CurrentSwitchValue", $switchValue);
 
 			$instances = $this->getRegisteredInstances();
 
@@ -55,14 +72,30 @@
 				$instance = IPS_GetInstance($instance->InstanceID);
 				switch($instance["ModuleInfo"]["ModuleName"]) {
 					case "HUELight":
-						//HUE_SetBrightness($instance["InstanceID"], $integerValue);
 						$params = array(
-							"BRIGHTNESS" => $integerValue,
-							"STATE" => ($integerValue > 0),
-							"TRANSITIONTIME" => 200
+							"BRIGHTNESS" => $dimValue*2,54,
+							"STATE" => ($dimValue > 0),
+							"TRANSITIONTIME" => $transitionTime
 						);
 						HUE_SetValues($instance["InstanceID"], $params);
-						IPS_LogMessage("LightControl", $integerValue);
+						IPS_LogMessage("LightControl", $dimValue);
+					break;
+					case "Z2DLightSwitch":
+						if(@IPS_GetObjectIDByIdent("Z2D_Brightness", $instance["InstanceID"])) {
+							// we have brightness capabilities
+							Z2D_DimSetEx($instance["InstanceID"], $dimValue, $transitionTime);
+							IPS_LogMessage("LightControl", sprintf("Dim value: %d", $dimValue));
+						} else if(@IPS_GetObjectIDByIdent("Z2D_State", $instance["InstanceID"])) {
+							// we have on/off capabilities
+							Z2D_SwitchMode($instance["InstanceID"], $switchValue);
+						}
+					break;
+					case "Z-Wave Module":
+						if(@IPS_GetObjectIDByIdent("IntensityVariable", $instance["InstanceID"])) {
+							ZW_DimSetEx($instance["InstanceID"], $dimValue, $transitionTime);
+						} else if(@IPS_GetObjectIDByIdent("StatusVariable", $instance["InstanceID"])) {
+							ZW_SwitchMode($instance["InstanceID"], $switchValue);
+						}
 					break;
 				}
 				// switch($instance["VariableType"]) {
@@ -85,30 +118,26 @@
 			parent::Destroy();
 		}
 
+		private function getEnablingVariables() {
+			$variablesJson = $this->ReadPropertyString("EnablingVariables");
+			$result = json_decode($variablesJson);
+			return (json_last_error() == JSON_ERROR_NONE) ? $result : NULL;
+		}
+
 		private function getRegisteredInstances() {
 			$instancesJson = $this->ReadPropertyString("Instances");
 			$result = json_decode($instancesJson);
 			return (json_last_error() == JSON_ERROR_NONE) ? $result : NULL;
 		}
 
-		private function calculateFloatValue($illuminationValue) {
+		private function calculateDimValue($illuminationValue) {
 			$bottomDimValue = $this->ReadPropertyInteger("BottomDimValue");
 			$topDimValue = $this->ReadPropertyInteger("TopDimValue");
 
 			$delta = $topDimValue - $bottomDimValue;
 
-			$dimValue = 1 - round(($illuminationValue - $bottomDimValue) / $delta, 1);
-			return min(1.0, max(0.0, $dimValue));
-		}
-
-		private function calculateIntegerValue($illuminationValue) {
-			$bottomDimValue = $this->ReadPropertyInteger("BottomDimValue");
-			$topDimValue = $this->ReadPropertyInteger("TopDimValue");
-
-			$delta = $topDimValue - $bottomDimValue;
-
-			$dimValue = 254 - round((($illuminationValue - $bottomDimValue) / $delta) * 254);
-			return min(254, max(0, $dimValue));
+			$dimValue = 100 - round((($illuminationValue - $bottomDimValue) / $delta) * 100);
+			return min(100, max(0, $dimValue));
 		}
 
 		private function calculateSwitchValue($illuminationValue) {
