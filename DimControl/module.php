@@ -1,6 +1,6 @@
 <?php
 
-	require_once(__DIR__ . "/../include/LightControlModule.php");
+	require_once(__DIR__ . "/../libs/LightControlModule.php");
 	class DimControl extends LightControlModule {
 
 		public function Create() {
