@@ -1,4 +1,4 @@
-# LightControl
+# DimControl
 Beschreibung des Moduls.
 
 ### Inhaltsverzeichnis
@@ -21,12 +21,12 @@ Beschreibung des Moduls.
 
 ### 3. Software-Installation
 
-* Über den Module Store das 'LightControl'-Modul installieren.
+* Über den Module Store das 'DimControl'-Modul installieren.
 * Alternativ über das Module Control folgende URL hinzufügen
 
 ### 4. Einrichten der Instanzen in IP-Symcon
 
- Unter 'Instanz hinzufügen' kann das 'LightControl'-Modul mithilfe des Schnellfilters gefunden werden.  
+ Unter 'Instanz hinzufügen' kann das 'DimControl'-Modul mithilfe des Schnellfilters gefunden werden.  
 	- Weitere Informationen zum Hinzufügen von Instanzen in der [Dokumentation der Instanzen](https://www.symcon.de/service/dokumentation/konzepte/instanzen/#Instanz_hinzufügen)
 
 __Konfigurationsseite__:
@@ -60,8 +60,8 @@ Die Funktionalität, die das Modul im WebFront bietet.
 
 ### 7. PHP-Befehlsreferenz
 
-`boolean LC_BeispielFunktion(integer $InstanzID);`
+`boolean DC_BeispielFunktion(integer $InstanzID);`
 Erklärung der Funktion.
 
 Beispiel:
-`LC_BeispielFunktion(12345);`
+`DC_BeispielFunktion(12345);`
