@@ -1,5 +1,7 @@
 <?php
-	class DimControl extends IPSModule {
+
+	require_once(__DIR__ . "/../include/LightControlModule.php");
+	class DimControl extends LightControlModule {
 
 		public function Create() {
 			//Never delete this line!
@@ -12,8 +14,6 @@
 			$this->RegisterPropertyInteger("BottomSwitchValue", 0);
 			$this->RegisterPropertyInteger("TopSwitchValue", 0);
 			$this->RegisterPropertyInteger("IlluminationValue", 0);
-			$this->RegisterPropertyString("Instances", "");
-			$this->RegisterPropertyString("EnablingVariables", "");
 			$this->RegisterPropertyInteger("DelayValue", 5);
 			
 			$this->RegisterVariableInteger("CurrentDimValue", "Current dim value", "LC.Brightness", 0);
@@ -52,16 +52,9 @@
 			$this->applyLightState($illumination);
 		}
 
-		public function applyLightState($illumination) {
-			$enablingVariables = $this->getEnablingVariables();
-			foreach($enablingVariables as $enablingVariable) {
-				if(GetValueBoolean($enablingVariable->VariableID) && $enablingVariable->Invert) {
-					return;
-				}
-
-				if(!GetValueBoolean($enablingVariable->VariableID) && !$enablingVariable->Invert) {
-					return;
-				}
+		public function applyLightState(int $illumination) {
+			if(!$this->isModuleActive()) {
+				return;
 			}
 
 			$transitionTime = $this->ReadPropertyInteger("DelayValue") * 10;
@@ -75,53 +68,13 @@
 			$instances = $this->getRegisteredInstances();
 
 			foreach($instances as $instance) {
-				$instance = IPS_GetInstance($instance->InstanceID);
-				switch($instance["ModuleInfo"]["ModuleName"]) {
-					case "HUELight":
-						$params = array(
-							"BRIGHTNESS" => $dimValue*2,54,
-							"STATE" => ($dimValue > 0),
-							"TRANSITIONTIME" => $transitionTime
-						);
-						HUE_SetValues($instance["InstanceID"], $params);
-						IPS_LogMessage("LightControl", $dimValue);
-					break;
-					case "Z2DLightSwitch":
-						if(@IPS_GetObjectIDByIdent("Z2D_Brightness", $instance["InstanceID"])) {
-							// we have brightness capabilities
-							Z2D_DimSetEx($instance["InstanceID"], $dimValue, $transitionTime);
-							IPS_LogMessage("LightControl", sprintf("Dim value: %d", $dimValue));
-						} else if(@IPS_GetObjectIDByIdent("Z2D_State", $instance["InstanceID"])) {
-							// we have on/off capabilities
-							Z2D_SwitchMode($instance["InstanceID"], $switchValue);
-						}
-					break;
-					case "Z-Wave Module":
-						if(@IPS_GetObjectIDByIdent("IntensityVariable", $instance["InstanceID"])) {
-							ZW_DimSetEx($instance["InstanceID"], $dimValue, $transitionTime);
-						} else if(@IPS_GetObjectIDByIdent("StatusVariable", $instance["InstanceID"])) {
-							ZW_SwitchMode($instance["InstanceID"], $switchValue);
-						}
-					break;
-				}
+				$this->switchLight($instance->InstanceID, $dimValue, $switchValue, $transitionTime);
 			}
 		}
 
 		public function Destroy() {
 			//Never delete this line!
 			parent::Destroy();
-		}
-
-		private function getEnablingVariables() {
-			$variablesJson = $this->ReadPropertyString("EnablingVariables");
-			$result = json_decode($variablesJson);
-			return (json_last_error() == JSON_ERROR_NONE) ? $result : NULL;
-		}
-
-		private function getRegisteredInstances() {
-			$instancesJson = $this->ReadPropertyString("Instances");
-			$result = json_decode($instancesJson);
-			return (json_last_error() == JSON_ERROR_NONE) ? $result : NULL;
 		}
 
 		private function calculateDimValue($illuminationValue) {
