@@ -3,21 +3,25 @@
         {
             "name":"BottomDimValue",
             "type":"NumberSpinner",
+            "suffix": "lx",
             "caption":"Bottom dim value"
         },
         {
             "name":"TopDimValue",
             "type":"NumberSpinner",
+            "suffix": "lx",
             "caption":"Top dim value"
         },
         {
             "name":"BottomSwitchValue",
             "type":"NumberSpinner",
+            "suffix": "lx",
             "caption":"Bottom switch value"
         },
         {
             "name":"TopSwitchValue",
             "type":"NumberSpinner",
+            "suffix": "lx",
             "caption":"Top switch value"
         },
         {   "type": "SelectVariable",
@@ -27,7 +31,8 @@
         {
             "name":"DelayValue",
             "type":"NumberSpinner",
-            "caption":"Number of seconds for transition"
+            "suffix": "s",
+            "caption":"Transition duration"
         },
         {
             "type": "List",
