@@ -18,7 +18,6 @@
                         "TRANSITIONTIME" => $transitionTime
                     );
                     HUE_SetValues($instance["InstanceID"], $params);
-                    IPS_LogMessage("LightControl", $dimValue);
                 break;
                 case "Z2DLightSwitch":
                     if(@IPS_GetObjectIDByIdent("Z2D_Brightness", $instance["InstanceID"])) {
