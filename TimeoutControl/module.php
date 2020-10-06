@@ -27,8 +27,10 @@
 			parent::ApplyChanges();
 
 			$motionSensorSources = $this->getTriggeringVariables();
-			foreach($motionSensorSources as $motionSensorSource) {
-				$this->RegisterMessage($motionSensorSource->VariableID, VM_UPDATE);
+			if($motionSensorSources) {
+				foreach($motionSensorSources as $motionSensorSource) {
+					$this->RegisterMessage($motionSensorSource->VariableID, VM_UPDATE);
+				}
 			}
 		}
 
@@ -50,16 +52,19 @@
 			$instances = $this->getRegisteredInstances();
 
 			if($isMotionActive) {
+				IPS_LogMessage("DimControl", "Turning everything on");
 				$this->SetTimerInterval($this->timerName, 0);
 				foreach($instances as $instance) {
 					$this->switchLight($instance->InstanceID, $instance->DimLevelHigh, true, 0);
 				}
 			} else {
 				if($this->GetTimerInterval($this->timerName) == 0) {
+					IPS_LogMessage("DimControl", "Starting dimming sequence");
 					$this->SetTimerInterval($this->timerName, $offTimeout*1000);
 					$this->dimLights();
 				} else {
-					turnOff();
+					IPS_LogMessage("DimControl", "Turning everything off");
+					$this->turnOff();
 				}
 			}
 		}
@@ -109,7 +114,9 @@
 			$offTimeout = $this->ReadPropertyInteger("OffTimeout");
 			$instances = $this->getRegisteredInstances();
 			foreach($instances as $instance) {
-				$this->switchLight($instance->InstanceID, $instance->DimLevelLow, true, round($offTimeout/2));
+				if($this->getLightBrightness($instance->InstanceID) > $instance->DimLevelLow) {
+					$this->switchLight($instance->InstanceID, $instance->DimLevelLow, true, round($offTimeout/2));
+				}
 			}
 		}
 

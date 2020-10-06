@@ -6,14 +6,40 @@
             $this->RegisterPropertyString("Instances", "");
 			$this->RegisterPropertyString("EnablingVariables", "");
         }
+
+        protected function getLightBrightness($instanceId) {
+            $instance = IPS_GetInstance($instanceId);
+            switch($instance["ModuleInfo"]["ModuleName"]) {
+                case "HUELight":
+                    return HUE_GetBrightness($instance["InstanceID"]);
+                break;
+                case "Z2DLightSwitch":
+                    if($brightnessVariable = @IPS_GetObjectIDByIdent("Z2D_Brightness", $instance["InstanceID"])) {
+                        // we have brightness capabilities
+                        return GetValueInteger($brightnessVariable);
+                    } else if($stateVariable = @IPS_GetObjectIDByIdent("Z2D_State", $instance["InstanceID"])) {
+                        // we have on/off capabilities
+                        return GetValueBoolean($stateVariable) ? 100 : 0;
+                    }
+                break;
+                case "Z-Wave Module":
+                    if($brightnessVariable = @IPS_GetObjectIDByIdent("IntensityVariable", $instance["InstanceID"])) {
+                        return GetValueInteger($brightnessVariable);
+                    } else if($stateVariable = @IPS_GetObjectIDByIdent("StatusVariable", $instance["InstanceID"])) {
+                        return GetValueBoolean($stateVariable) ? 100 : 0;
+                    }
+                break;
+            }
+        }
         
         protected function switchLight($instanceId, $dimValue, $switchValue, $transitionTime) {
             $transitionTime *= 10;
+            $transitionTime = min(255, $transitionTime);
             $instance = IPS_GetInstance($instanceId);
             switch($instance["ModuleInfo"]["ModuleName"]) {
                 case "HUELight":
                     $params = array(
-                        "BRIGHTNESS" => $dimValue*2,54,
+                        "BRIGHTNESS" => round($dimValue*2,54),
                         "STATE" => ($dimValue > 0),
                         "TRANSITIONTIME" => $transitionTime
                     );
