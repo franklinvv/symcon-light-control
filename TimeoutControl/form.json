@@ -1,5 +1,84 @@
 {
-    "elements": [],
+    "elements": [
+        {   "type": "SelectVariable",
+            "name": "MotionSensorValueID",
+            "caption": "Motion sensor value"
+        },
+        {   "type": "NumberSpinner",
+            "name": "DimValueWhenMotionActive",
+            "suffix": "%",
+            "caption": "Dim value when motion active"
+        },
+        {   "type": "NumberSpinner",
+            "name": "DimValueWhenMotionInactive",
+            "suffix": "%",
+            "caption": "Dim value when motion inactive"
+        },
+        {   "type": "NumberSpinner",
+            "name": "OffTimeout",
+            "suffix": "s",
+            "caption": "Timeout for turning off completely (s)"
+        },
+        {
+            "type": "List",
+            "name": "EnablingVariables",
+            "caption": "Enabling variables",
+            "add": true,
+            "delete": true,
+            "sort": {
+                "column": "VariableID",
+                "direction": "ascending"
+            },
+            "columns": [
+                {
+                    "caption": "Variable",
+                    "name": "VariableID",
+                    "width": "auto",
+                    "add": 0,
+                    "edit": {
+                        "type": "SelectVariable"
+                    }
+                },
+                {
+                    "caption": "Invert",
+                    "name": "Invert",
+                    "width": "20",
+                    "add": 0,
+                    "edit": {
+                        "type": "Select",
+                        "options": [
+                            {"caption": "No", "value": 0},
+                            {"caption": "Yes", "value": 1}
+                        ]
+                    }
+                }
+            ],
+            "values": []
+        },
+        {
+            "type": "List",
+            "name": "Instances",
+            "caption": "Instances",
+            "add": true,
+            "delete": true,
+            "sort": {
+                "column": "InstanceID",
+                "direction": "ascending"
+            },
+            "columns": [
+                {
+                    "caption": "Instance",
+                    "name": "InstanceID",
+                    "width": "auto",
+                    "add": 0,
+                    "edit": {
+                        "type": "SelectInstance"
+                    }
+                }
+            ],
+            "values": []
+        }
+    ],
     "actions": [],
     "status": []
 }
