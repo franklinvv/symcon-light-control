@@ -2,5 +2,8 @@
 
 Folgende Module beinhaltet das LightControl Repository:
 
-- __LightControl__ ([Dokumentation](LightControl))  
+- __DimControl__ ([Dokumentation](DimControl))  
+	Kurze Beschreibung des Moduls.
+	
+- __TimeoutControl__ ([Dokumentation](TimeoutControl))  
 	Kurze Beschreibung des Moduls.
