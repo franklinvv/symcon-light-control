@@ -27,6 +27,12 @@
 			//Never delete this line!
 			parent::ApplyChanges();
 
+			// unregister from all messages, so we can safely readd just the necessary ones
+			foreach(array_keys($this->GetMessageList()) as $message) {
+				$this->UnregisterMessage($message, VM_UPDATE);
+			}
+
+			// register for triggering variable changes
 			$motionSensorSources = $this->getTriggeringVariables();
 			if($motionSensorSources) {
 				foreach($motionSensorSources as $motionSensorSource) {
@@ -36,16 +42,13 @@
 		}
 
 		public function MessageSink($timestamp, $senderId, $message, $data) {
-			if(!$this->isModuleActive()) {
-				return;
-			}
+			if(!$this->isModuleActive()) return;
+			if($message != VM_UPDATE) return;
 
-			$isMotionActive = false;
-			if($this->isSenderValid($senderId)) {
-				$isMotionActive = $this->isMotionActive();
-			} else {
-				return;
-			}
+			$object = IPS_GetObject(IPS_GetParent($senderId));
+			$this->SendDebug(sprintf("%s (#%d)", $object["ObjectName"], $senderId), GetValueBoolean($senderId) ? "Active" : "Inactive", 0);
+
+			$isMotionActive = $this->isMotionActive();
 
 			$offTimeout = $this->ReadPropertyInteger("OffTimeout");
 
@@ -53,21 +56,21 @@
 
 			if($isMotionActive) {
 				if(!$this->areLightSensorsEnabled()) {
-					IPS_LogMessage("DimControl", "Too much light to turn on lights");
+					IPS_LogMessage("TimeoutControl", "Too bright to turn on lights");
 					return;
 				}
-				IPS_LogMessage("DimControl", "Turning everything on");
-				$this->SetTimerInterval($this->timerName, 0);
+				IPS_LogMessage("TimeoutControl", "Turning everything on");
 				foreach($instances as $instance) {
 					$this->switchLight($instance->InstanceID, $instance->DimLevelHigh, true, 0);
 				}
+				$this->SetTimerInterval($this->timerName, 0);
 			} else {
 				if($this->GetTimerInterval($this->timerName) == 0) {
-					IPS_LogMessage("DimControl", "Starting dimming sequence");
-					$this->SetTimerInterval($this->timerName, $offTimeout*1000);
+					$this->SendDebug("Main", "Starting dimming sequence");
 					$this->dimLights();
+					$this->SetTimerInterval($this->timerName, $offTimeout*1000);
 				} else {
-					IPS_LogMessage("DimControl", "Turning everything off");
+					$this->SendDebug("Main", "Turning everything off");
 					$this->turnOff();
 				}
 			}
@@ -90,28 +93,12 @@
 			$triggeringVariables = $this->getTriggeringVariables();
 			$isMotionActive = false;
 			foreach($triggeringVariables as $triggeringVariable) {
+				$object = IPS_GetObject(IPS_GetParent($triggeringVariable->VariableID));
 				if(GetValueBoolean($triggeringVariable->VariableID)) {
 					$isMotionActive = true;
 				}
 			}
 			return $isMotionActive;
-		}
-
-		private function isSenderValid($senderId) {
-			$triggeringVariables = $this->getTriggeringVariables();
-			$isMotionActive = false;
-			$isSenderValid = false;
-			foreach($triggeringVariables as $triggeringVariable) {
-				if($senderId == $triggeringVariable->VariableID) {
-					$isSenderValid = true;
-				}
-			}
-
-			if(!$isSenderValid) {
-				$this->UnregisterMessage($senderId, VM_UPDATE);
-			}
-
-			return $isSenderValid;
 		}
 
 		protected function getTriggeringVariables() {
