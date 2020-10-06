@@ -11,6 +11,7 @@
 
 			$this->RegisterPropertyInteger("OffTimeout", 60);
 			$this->RegisterPropertyString("TriggeringVariables", 0);
+			$this->RegisterPropertyString("LightSensorValues", 0);
 
 			$this->RegisterTimer($this->timerName, 0, "TC_turnOff(\$_IPS['TARGET']);");
 		}
@@ -45,13 +46,16 @@
 			} else {
 				return;
 			}
-			
 
 			$offTimeout = $this->ReadPropertyInteger("OffTimeout");
 
 			$instances = $this->getRegisteredInstances();
 
 			if($isMotionActive) {
+				if(!$this->areLightSensorsEnabled()) {
+					IPS_LogMessage("DimControl", "Too much light to turn on lights");
+					return;
+				}
 				IPS_LogMessage("DimControl", "Turning everything on");
 				$this->SetTimerInterval($this->timerName, 0);
 				foreach($instances as $instance) {
@@ -67,6 +71,17 @@
 					$this->turnOff();
 				}
 			}
+		}
+
+		private function areLightSensorsEnabled() {
+			$lightSensors = $this->getLightSensors();
+			foreach($lightSensors as $lightSensor) {
+				$sensorValue = GetValueFloat($lightSensor->VariableID);
+				if($sensorValue <= $lightSensor->Threshold) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		private function isMotionActive() {
@@ -99,6 +114,12 @@
 
 		protected function getTriggeringVariables() {
 			$variablesJson = $this->ReadPropertyString("TriggeringVariables");
+			$result = json_decode($variablesJson);
+			return (json_last_error() == JSON_ERROR_NONE) ? $result : NULL;
+		}
+
+		protected function getLightSensors() {
+			$variablesJson = $this->ReadPropertyString("LightSensorValues");
 			$result = json_decode($variablesJson);
 			return (json_last_error() == JSON_ERROR_NONE) ? $result : NULL;
 		}

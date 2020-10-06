@@ -48,7 +48,7 @@
             "caption": "Instances",
             "add": true,
             "delete": true,
-            "rowCount": 10,
+            "rowCount": 5,
             "sort": {
                 "column": "InstanceID",
                 "direction": "ascending"
@@ -116,6 +116,40 @@
                             {"caption": "No", "value": 0},
                             {"caption": "Yes", "value": 1}
                         ]
+                    }
+                }
+            ],
+            "values": []
+        },
+        {
+            "type": "List",
+            "name": "LightSensorValues",
+            "caption": "Light sensor values",
+            "add": true,
+            "delete": true,
+            "rowCount": 5,
+            "sort": {
+                "column": "VariableID",
+                "direction": "ascending"
+            },
+            "columns": [
+                {
+                    "caption": "Variable",
+                    "name": "VariableID",
+                    "width": "auto",
+                    "add": 0,
+                    "edit": {
+                        "type": "SelectVariable"
+                    }
+                },
+                {
+                    "caption": "Threshold",
+                    "name": "Threshold",
+                    "width": "20",
+                    "add": 0,
+                    "edit": {
+                        "type": "NumberSpinner",
+                        "suffix": " lx"
                     }
                 }
             ],
