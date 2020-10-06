@@ -11,46 +11,11 @@
         },
         {
             "type": "List",
-            "name": "EnablingVariables",
-            "caption": "Enabling variables",
-            "add": true,
-            "delete": true,
-            "sort": {
-                "column": "VariableID",
-                "direction": "ascending"
-            },
-            "columns": [
-                {
-                    "caption": "Variable",
-                    "name": "VariableID",
-                    "width": "auto",
-                    "add": 0,
-                    "edit": {
-                        "type": "SelectVariable"
-                    }
-                },
-                {
-                    "caption": "Invert",
-                    "name": "Invert",
-                    "width": "20",
-                    "add": 0,
-                    "edit": {
-                        "type": "Select",
-                        "options": [
-                            {"caption": "No", "value": 0},
-                            {"caption": "Yes", "value": 1}
-                        ]
-                    }
-                }
-            ],
-            "values": []
-        },
-        {
-            "type": "List",
             "name": "Instances",
             "caption": "Instances",
             "add": true,
             "delete": true,
+            "rowCount": 10,
             "sort": {
                 "column": "InstanceID",
                 "direction": "ascending"
@@ -81,6 +46,43 @@
                     "add": 0,
                     "edit": {
                         "type": "NumberSpinner"
+                    }
+                }
+            ],
+            "values": []
+        },
+        {
+            "type": "List",
+            "name": "EnablingVariables",
+            "caption": "Enabling variables",
+            "add": true,
+            "delete": true,
+            "rowCount": 5,
+            "sort": {
+                "column": "VariableID",
+                "direction": "ascending"
+            },
+            "columns": [
+                {
+                    "caption": "Variable",
+                    "name": "VariableID",
+                    "width": "auto",
+                    "add": 0,
+                    "edit": {
+                        "type": "SelectVariable"
+                    }
+                },
+                {
+                    "caption": "Invert",
+                    "name": "Invert",
+                    "width": "20",
+                    "add": 0,
+                    "edit": {
+                        "type": "Select",
+                        "options": [
+                            {"caption": "No", "value": 0},
+                            {"caption": "Yes", "value": 1}
+                        ]
                     }
                 }
             ],
