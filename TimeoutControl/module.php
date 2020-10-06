@@ -75,13 +75,15 @@
 
 		private function areLightSensorsEnabled() {
 			$lightSensors = $this->getLightSensors();
-			foreach($lightSensors as $lightSensor) {
-				$sensorValue = GetValueFloat($lightSensor->VariableID);
-				if($sensorValue <= $lightSensor->Threshold) {
-					return true;
+			if($lightSensors) {
+				foreach($lightSensors as $lightSensor) {
+					$sensorValue = GetValueFloat($lightSensor->VariableID);
+					if($sensorValue <= $lightSensor->Threshold) {
+						return true;
+					}
 				}
 			}
-			return false;
+			return true;
 		}
 
 		private function isMotionActive() {
