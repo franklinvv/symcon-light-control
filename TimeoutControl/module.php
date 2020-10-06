@@ -10,8 +10,6 @@
 			parent::Create();
 
 			$this->RegisterPropertyInteger("MotionSensorValueID", 0);
-			$this->RegisterPropertyInteger("DimLevelWhenMotionActive", 100);
-			$this->RegisterPropertyInteger("DimLevelWhenMotionInactive", 10);
 			$this->RegisterPropertyInteger("OffTimeout", 60);
 
 			$this->RegisterTimer($this->timerName, 0, "TC_turnOff(\$_IPS['TARGET']);");
@@ -53,27 +51,33 @@
 
 			$instances = $this->getRegisteredInstances();
 
-			$dimLevelWhenMotionActive = $this->ReadPropertyInteger("DimLevelWhenMotionInactive");
-
 			if($isMotionActive) {
 				foreach($instances as $instance) {
 					$this->SetTimerInterval($this->timerName, 0);
-					$this->switchLight($instance->InstanceID, 100, true, round($offTimeout/2));
+					$this->switchLight($instance->InstanceID, $instance->DimLevelHigh, true, 0);
 				}
 			} else {
 				if($this->GetTimerInterval() == 0) {
 					$this->SetTimerInterval($this->timerName, $offTimeout*1000);
+					$this->dimLights();
 				} else {
 					turnOff();
 				}
 			}
 		}
 
-		function dimLights() {
+		function turnOn() {
 			$instances = $this->getRegisteredInstances();
-			$dimLevelWhenMotionInactive = $this->ReadPropertyInteger("DimLevelWhenMotionActive");
 			foreach($instances as $instance) {
-				$this->switchLight($instance->InstanceID, $dimLevelWhenMotionInactive, true, 0);
+				$this->switchLight($instance->InstanceID, $instance->DimLevelHigh, true, 0);
+			}
+		}
+
+		function dimLights() {
+			$offTimeout = $this->ReadPropertyInteger("OffTimeout");
+			$instances = $this->getRegisteredInstances();
+			foreach($instances as $instance) {
+				$this->switchLight($instance->InstanceID, $instance->DimLevelLow, true, round($offTimeout/2));
 			}
 		}
 

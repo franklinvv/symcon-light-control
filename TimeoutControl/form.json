@@ -5,19 +5,9 @@
             "caption": "Motion sensor value"
         },
         {   "type": "NumberSpinner",
-            "name": "DimValueWhenMotionActive",
-            "suffix": "%",
-            "caption": "Dim value when motion active"
-        },
-        {   "type": "NumberSpinner",
-            "name": "DimValueWhenMotionInactive",
-            "suffix": "%",
-            "caption": "Dim value when motion inactive"
-        },
-        {   "type": "NumberSpinner",
             "name": "OffTimeout",
             "suffix": "s",
-            "caption": "Timeout for turning off completely (s)"
+            "caption": "Timeout for turning off completely"
         },
         {
             "type": "List",
@@ -73,6 +63,24 @@
                     "add": 0,
                     "edit": {
                         "type": "SelectInstance"
+                    }
+                },
+                {
+                    "caption": "Dim value when motion active",
+                    "name": "DimLevelHigh",
+                    "width": "200",
+                    "add": 0,
+                    "edit": {
+                        "type": "NumberSpinner"
+                    }
+                },
+                {
+                    "caption": "Dim value when motion inactive",
+                    "name": "DimLevelLow",
+                    "width": "200",
+                    "add": 0,
+                    "edit": {
+                        "type": "NumberSpinner"
                     }
                 }
             ],

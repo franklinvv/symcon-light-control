@@ -57,7 +57,7 @@
 				return;
 			}
 
-			$transitionTime = $this->ReadPropertyInteger("DelayValue") * 10;
+			$transitionTime = $this->ReadPropertyInteger("DelayValue");
 
 			$dimValue = $this->calculateDimValue($illumination);
 			$this->SetValue("CurrentDimValue", $dimValue);
