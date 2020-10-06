@@ -31,18 +31,18 @@
                     }
                 },
                 {
-                    "caption": "Dim value when motion active",
+                    "caption": "Active dim value",
                     "name": "DimLevelHigh",
-                    "width": "200",
+                    "width": "200px",
                     "add": 0,
                     "edit": {
                         "type": "NumberSpinner"
                     }
                 },
                 {
-                    "caption": "Dim value when motion inactive",
+                    "caption": "Inactive dim value",
                     "name": "DimLevelLow",
-                    "width": "200",
+                    "width": "200px",
                     "add": 0,
                     "edit": {
                         "type": "NumberSpinner"
