@@ -33,23 +33,36 @@
         }
         
         protected function switchLight($instanceId, $dimValue, $switchValue, $transitionTime) {
+            $this->SendDebug(sprintf("%s (#%d)", IPS_GetObject($instanceId)["ObjectName"], $instanceId), sprintf("Set to %d", $dimValue), 0);
+
             $transitionTime *= 10;
             $transitionTime = min(255, $transitionTime);
             $instance = IPS_GetInstance($instanceId);
             switch($instance["ModuleInfo"]["ModuleName"]) {
                 case "HUELight":
-                    $params = array(
-                        "BRIGHTNESS" => round($dimValue*2,54),
-                        "STATE" => ($dimValue > 0),
-                        "TRANSITIONTIME" => $transitionTime
-                    );
+                    $params = array();
+                    if($transitionTime > 0) {
+                        $params = array(
+                            "BRIGHTNESS" => round($dimValue*2.54),
+                            "STATE" => ($dimValue > 0),
+                            "TRANSITIONTIME" => $transitionTime
+                        );
+                    } else {
+                        $params = array(
+                            "BRIGHTNESS" => round($dimValue*2.54),
+                            "STATE" => ($dimValue > 0)
+                        );
+                    }
                     HUE_SetValues($instance["InstanceID"], $params);
                 break;
                 case "Z2DLightSwitch":
                     if(@IPS_GetObjectIDByIdent("Z2D_Brightness", $instance["InstanceID"])) {
                         // we have brightness capabilities
-                        Z2D_DimSetEx($instance["InstanceID"], $dimValue, $transitionTime);
-                        IPS_LogMessage("LightControl", sprintf("Dim value: %d", $dimValue));
+                        if($transitionTime > 0) {
+                            Z2D_DimSetEx($instance["InstanceID"], $dimValue, $transitionTime);
+                        } else {
+                            Z2D_DimSet($instance["InstanceID"], $dimValue);
+                        }
                     } else if(@IPS_GetObjectIDByIdent("Z2D_State", $instance["InstanceID"])) {
                         // we have on/off capabilities
                         Z2D_SwitchMode($instance["InstanceID"], $switchValue);
@@ -57,7 +70,11 @@
                 break;
                 case "Z-Wave Module":
                     if(@IPS_GetObjectIDByIdent("IntensityVariable", $instance["InstanceID"])) {
-                        ZW_DimSetEx($instance["InstanceID"], $dimValue, $transitionTime);
+                        if($transitionTime > 0) {
+                            ZW_DimSetEx($instance["InstanceID"], $dimValue, $transitionTime);
+                        } else {
+                            ZW_DimSet($instance["InstanceID"], $dimValue);
+                        }
                     } else if(@IPS_GetObjectIDByIdent("StatusVariable", $instance["InstanceID"])) {
                         ZW_SwitchMode($instance["InstanceID"], $switchValue);
                     }
