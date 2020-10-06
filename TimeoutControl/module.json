@@ -1,12 +1,12 @@
 {
-    "id": "{A22ABB6D-D408-DA39-69C1-BFB835D42558}",
-    "name": "LightControl",
+    "id": "{E7832471-B10D-F330-09E4-591F1FC5BBEB}",
+    "name": "TimeoutControl",
     "type": 3,
     "vendor": "Franklin van Velthuizen",
     "aliases": [],
     "parentRequirements": [],
     "childRequirements": [],
     "implemented": [],
-    "prefix": "LC",
+    "prefix": "TC",
     "url": ""
 }

@@ -1,0 +1,12 @@
+{
+    "id": "{A22ABB6D-D408-DA39-69C1-BFB835D42558}",
+    "name": "DimControl",
+    "type": 3,
+    "vendor": "Franklin van Velthuizen",
+    "aliases": [],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "DC",
+    "url": ""
+}

@@ -1,5 +1,5 @@
 <?php
-	class LightControl extends IPSModule {
+	class DimControl extends IPSModule {
 
 		public function Create() {
 			//Never delete this line!
@@ -27,6 +27,9 @@
 			$illuminationValueSource = $this->ReadPropertyInteger("IlluminationValue");
 			if($illuminationValueSource) {
 				$this->RegisterMessage($illuminationValueSource, VM_UPDATE);
+
+				$illumination = GetValueInteger($illuminationValueSource);
+				$this->applyLightState($illumination);
 			}
 		}
 
@@ -40,6 +43,16 @@
 		}
 
 		public function MessageSink($timestamp, $senderId, $message, $data) {
+			$illuminationValueSource = $this->ReadPropertyInteger("IlluminationValue");
+			if($senderId != $illuminationValueSource) {
+				$this->UnregisterMessage($senderId, VM_UPDATE);
+			}
+
+			$illumination = GetValueInteger($illuminationValueSource);
+			$this->applyLightState($illumination);
+		}
+
+		public function applyLightState($illumination) {
 			$enablingVariables = $this->getEnablingVariables();
 			foreach($enablingVariables as $enablingVariable) {
 				if(GetValueBoolean($enablingVariable->VariableID) && $enablingVariable->Invert) {
@@ -52,13 +65,6 @@
 			}
 
 			$transitionTime = $this->ReadPropertyInteger("DelayValue") * 10;
-
-			$illuminationValueSource = $this->ReadPropertyInteger("IlluminationValue");
-			if($senderId != $illuminationValueSource) {
-				$this->UnregisterMessage($senderId, VM_UPDATE);
-			}
-
-			$illumination = GetValueInteger($illuminationValueSource);
 
 			$dimValue = $this->calculateDimValue($illumination);
 			$this->SetValue("CurrentDimValue", $dimValue);
@@ -98,18 +104,6 @@
 						}
 					break;
 				}
-				// switch($instance["VariableType"]) {
-				// 	case 0:
-				// 		RequestAction($variable["VariableID"], $boolValue);
-				// 	break;
-				// 	case 1:
-				// 		RequestAction($variable["VariableID"], $integerValue);
-				// 	break;
-				// 	default:
-				// 	case 2:
-				// 		RequestAction($variable["VariableID"], $floatValue);
-				// 	break;
-				// }
 			}
 		}
 
