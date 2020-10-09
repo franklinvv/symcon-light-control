@@ -33,8 +33,6 @@
         }
         
         protected function switchLight($instanceId, $dimValue, $switchValue, $transitionTime) {
-            $this->SendDebug(sprintf("%s (#%d)", IPS_GetObject($instanceId)["ObjectName"], $instanceId), sprintf("Set to %d", $dimValue), 0);
-
             $transitionTime *= 10;
             $transitionTime = min(255, $transitionTime);
             $instance = IPS_GetInstance($instanceId);
@@ -53,6 +51,7 @@
                             "STATE" => ($dimValue > 0)
                         );
                     }
+                    $this->SendDebug(sprintf("%s (#%d)", IPS_GetObject($instanceId)["ObjectName"], $instanceId), sprintf("Set to %d", $dimValue), 0);
                     HUE_SetValues($instance["InstanceID"], $params);
                 break;
                 case "Z2DLightSwitch":
@@ -63,9 +62,11 @@
                         } else {
                             Z2D_DimSet($instance["InstanceID"], $dimValue);
                         }
+                        $this->SendDebug(sprintf("%s (#%d)", IPS_GetObject($instanceId)["ObjectName"], $instanceId), sprintf("Set to %d", $dimValue), 0);
                     } else if(@IPS_GetObjectIDByIdent("Z2D_State", $instance["InstanceID"])) {
                         // we have on/off capabilities
                         Z2D_SwitchMode($instance["InstanceID"], $switchValue);
+                        $this->SendDebug(sprintf("%s (#%d)", IPS_GetObject($instanceId)["ObjectName"], $instanceId), sprintf("Switched %s", $switchValue ? "on" : "off"), 0);
                     }
                 break;
                 case "Z-Wave Module":
@@ -75,8 +76,10 @@
                         } else {
                             ZW_DimSet($instance["InstanceID"], $dimValue);
                         }
+                        $this->SendDebug(sprintf("%s (#%d)", IPS_GetObject($instanceId)["ObjectName"], $instanceId), sprintf("Set to %d", $dimValue), 0);
                     } else if(@IPS_GetObjectIDByIdent("StatusVariable", $instance["InstanceID"])) {
                         ZW_SwitchMode($instance["InstanceID"], $switchValue);
+                        $this->SendDebug(sprintf("%s (#%d)", IPS_GetObject($instanceId)["ObjectName"], $instanceId), sprintf("Switched %s", $switchValue ? "on" : "off"), 0);
                     }
                 break;
             }

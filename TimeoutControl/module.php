@@ -56,21 +56,21 @@
 
 			if($isMotionActive) {
 				if(!$this->areLightSensorsEnabled()) {
-					IPS_LogMessage("TimeoutControl", "Too bright to turn on lights");
+					$this->SendDebug("Main", "Too bright to turn on lights", 0);
 					return;
 				}
-				IPS_LogMessage("TimeoutControl", "Turning everything on");
+				$this->SendDebug("Main", "Turning everything on", 0);
 				foreach($instances as $instance) {
 					$this->switchLight($instance->InstanceID, $instance->DimLevelHigh, true, 0);
 				}
 				$this->SetTimerInterval($this->timerName, 0);
 			} else {
 				if($this->GetTimerInterval($this->timerName) == 0) {
-					$this->SendDebug("Main", "Starting dimming sequence");
+					$this->SendDebug("Main", "Starting dimming sequence", 0);
 					$this->dimLights();
 					$this->SetTimerInterval($this->timerName, $offTimeout*1000);
 				} else {
-					$this->SendDebug("Main", "Turning everything off");
+					$this->SendDebug("Main", "Turning everything off", 0);
 					$this->turnOff();
 				}
 			}
@@ -81,12 +81,16 @@
 			if($lightSensors) {
 				foreach($lightSensors as $lightSensor) {
 					$sensorValue = GetValueFloat($lightSensor->VariableID);
+					$this->SendDebug("Main", sprintf("Variable ID: %d, sensorValue: %f, threshold: %d", $lightSensor->VariableID, $sensorValue, $lightSensor->Threshold), 0);
 					if($sensorValue <= $lightSensor->Threshold) {
 						return true;
 					}
 				}
+				return false;
+			} else {
+				$this->SendDebug("Main", "No light sensors", 0);
+				return true;
 			}
-			return true;
 		}
 
 		private function isMotionActive() {
