@@ -59,7 +59,6 @@
 
 			$isMotionActive = $this->isMotionActive();
 
-			$offTimeout = $this->ReadPropertyInteger("OffTimeout");
 
 			$instances = $this->getRegisteredInstances();
 
@@ -69,19 +68,38 @@
 					return;
 				}
 				$this->SendDebug("Main", "Turning everything on", 0);
+				if($this->ReadAttributeInteger(ATTRIBUTE_LAST_TRIGGERED) == 0) {
+					$this->WriteAttributeInteger(ATTRIBUTE_LAST_TRIGGERED, time());
+				}
+
 				foreach($instances as $instance) {
 					$this->switchLight($instance->InstanceID, $instance->DimLevelHigh, true, 0);
 				}
 				$this->SetTimerInterval($this->timerName, 0);
 			} else {
+				$offTimeout = $this->getTimeoutSeconds();
+
 				if($this->GetTimerInterval($this->timerName) == 0) {
 					$this->SendDebug("Main", "Starting dimming sequence", 0);
 					$this->dimLights();
 					$this->SetTimerInterval($this->timerName, $offTimeout*1000);
 				} else {
+					$this->WriteAttributeInteger(ATTRIBUTE_LAST_TRIGGERED, 0);
 					$this->SendDebug("Main", "Turning everything off", 0);
 					$this->turnOff();
 				}
+			}
+		}
+
+		private function getTimeoutSeconds() {
+			if($this->ReadPropertyBoolean(PROPERTY_DYNAMIC_TIMEOUT)) {
+				$maxTimeOut = $this->ReadPropertyInteger("OffTimeout");
+				$timestampLastTriggered = $this->ReadAttributeInteger(ATTRIBUTE_LAST_TRIGGERED);
+				$timeout = min($maxTimeOut, (time()-$timestampLastTriggered) / 2);
+				$this->SendDebug("Main", sprintf("Activity lasted for %d seconds. Setting timeout to %d seconds.", time()-$timestampLastTriggered, $timeout), 0);
+				return $timeout;
+			} else {
+				return $this->ReadPropertyInteger("OffTimeout");
 			}
 		}
 
@@ -134,8 +152,9 @@
 		}
 
 		function dimLights() {
-			$offTimeout = $this->ReadPropertyInteger("OffTimeout");
+			$offTimeout = $this->getTimeoutSeconds();
 			$instances = $this->getRegisteredInstances();
+			$this->SendDebug("Main", sprintf("Dimming lights over a period of %d seconds", $offTimeout));
 			foreach($instances as $instance) {
 				if($this->getLightBrightness($instance->InstanceID) > $instance->DimLevelLow) {
 					$this->switchLight($instance->InstanceID, $instance->DimLevelLow, true, round($offTimeout/2));
@@ -153,5 +172,6 @@
 				$this->switchLight($instance->InstanceID, 0, false, 0);
 			}
 			$this->SetTimerInterval($this->timerName, 0);
+			$this->WriteAttributeInteger(ATTRIBUTE_LAST_TRIGGERED, 0);
 		}
 	}
