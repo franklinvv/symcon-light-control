@@ -3,7 +3,12 @@
         {   "type": "NumberSpinner",
             "name": "OffTimeout",
             "suffix": "s",
-            "caption": "Timeout for turning off completely"
+            "caption": "Timeout (ignored if dynamic timeout is enabled)"
+        },
+        {   "type": "CheckBox",
+            "name": "DynamicTimeout",
+            "caption": "Dynamically shorten timeout based on presence duration",
+            "value": false
         },
         {
             "type": "List",
