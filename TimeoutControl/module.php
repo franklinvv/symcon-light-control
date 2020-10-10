@@ -1,6 +1,12 @@
 <?php
 
 	require_once(__DIR__ . "/../libs/LightControlModule.php");
+
+	define("PROPERTY_OFF_TIMEOUT", "OffTimeout");
+	define("PROPERTY_TRIGGERING_VARIABLES", "TriggeringVariables");
+	define("PROPERTY_LIGHT_SENSOR_VALUES", "LightSensorValues");
+	define("PROPERTY_DYNAMIC_TIMEOUT", "DynamicTimeout");
+	define("ATTRIBUTE_LAST_TRIGGERED", "AttributeLastTriggered");
 	class TimeoutControl extends LightControlModule {
 
 		var $timerName = "MotionTimeout";
@@ -9,9 +15,12 @@
 			//Never delete this line!
 			parent::Create();
 
-			$this->RegisterPropertyInteger("OffTimeout", 60);
-			$this->RegisterPropertyString("TriggeringVariables", 0);
-			$this->RegisterPropertyString("LightSensorValues", 0);
+			$this->RegisterPropertyInteger(PROPERTY_OFF_TIMEOUT, 60);
+			$this->RegisterPropertyString(PROPERTY_TRIGGERING_VARIABLES, 0);
+			$this->RegisterPropertyString(PROPERTY_LIGHT_SENSOR_VALUES, 0);
+			$this->RegisterPropertyBoolean(PROPERTY_DYNAMIC_TIMEOUT, 0);
+
+			$this->RegisterAttributeInteger(ATTRIBUTE_LAST_TRIGGERED, 0);
 
 			$this->RegisterTimer($this->timerName, 0, "TC_turnOff(\$_IPS['TARGET']);");
 		}
