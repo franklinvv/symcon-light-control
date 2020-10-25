@@ -28,7 +28,13 @@
 			if($illuminationValueSource) {
 				$this->RegisterMessage($illuminationValueSource, VM_UPDATE);
 
-				$illumination = GetValueInteger($illuminationValueSource);
+				$variableInfo = IPS_GetVariable($illuminationValueSource);
+				if($variableInfo['VariableType'] == 1) {
+					$illumination = GetValueInteger($illuminationValueSource);
+				} else if($variableInfo['VariableType'] == 2) {
+					$illumination = GetValueFloat($illuminationValueSource);
+				}
+				
 				$this->applyLightState($illumination);
 			}
 		}
@@ -48,7 +54,13 @@
 				$this->UnregisterMessage($senderId, VM_UPDATE);
 			}
 
-			$illumination = GetValueInteger($illuminationValueSource);
+			$variableInfo = IPS_GetVariable($illuminationValueSource);
+			if($variableInfo['VariableType'] == 1) {
+				$illumination = GetValueInteger($illuminationValueSource);
+			} else if($variableInfo['VariableType'] == 2) {
+				$illumination = GetValueFloat($illuminationValueSource);
+			}
+			
 			$this->applyLightState($illumination);
 		}
 
