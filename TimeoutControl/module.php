@@ -51,7 +51,6 @@
 		}
 
 		public function MessageSink($timestamp, $senderId, $message, $data) {
-			if(!$this->isModuleActive()) return;
 			if($message != VM_UPDATE) return;
 
 			$object = IPS_GetObject(IPS_GetParent($senderId));
@@ -63,6 +62,8 @@
 			$instances = $this->getRegisteredInstances();
 
 			if($isMotionActive) {
+				if(!$this->isModuleActive()) return;
+				
 				if(!$this->areLightSensorsEnabled()) {
 					$this->SendDebug("Main", "Too bright to turn on lights", 0);
 					return;
